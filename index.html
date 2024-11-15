@@ -62,7 +62,10 @@
         // Função para buscar dados do WebApp
         async function fetchData() {
             try {
-                const response = await fetch(webAppUrl);
+                const response = await fetch(webAppUrl, {
+                    method: 'GET'
+                });
+
                 const data = await response.json();
                 displayData(data);
             } catch (error) {

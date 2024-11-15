@@ -61,16 +61,23 @@
 
         // Função para buscar dados do WebApp
         async function fetchData() {
-            try {
-                const response = await fetch(webAppUrl, {
-                    method: 'GET'
-                });
+            const xhr = new XMLHttpRequest();
+            xhr.open("GET", webAppUrl, true); // Specify the HTTP method and URL
 
-                const data = await response.json();
-                displayData(data);
-            } catch (error) {
-                console.error('Erro ao buscar dados:', error);
-            }
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) { // Request is done
+                    if (xhr.status === 200) { // Success
+                        const data = JSON.parse(xhr.responseText);
+                        displayData(data);
+                    } else { // Error
+                        console.error('Error fetching data:', xhr.status, xhr.statusText);
+                        console.log('Response:', xhr.responseText); // Log the response for debugging
+                    }
+                }
+            };
+
+            // Send the request
+            xhr.send();
         }
 
         // Função para exibir os dados na tabela

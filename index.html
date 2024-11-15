@@ -38,10 +38,20 @@
     <h1>Gerenciamento de Tarefas</h1>
 
     <!-- Formulário para inserir dados -->
-    <input type="text" id="inputField" placeholder="Digite o nome da tarefa">
-    <button id="submitButton">Inserir Tarefa</button>
+     <div>
+        <input type="text" id="inputField" placeholder="Digite o nome da tarefa">
+        <button id="submitButton">Inserir Tarefa</button>
+     </div>
     
-    <button id="fetchButton">Carregar Tarefas</button>
+     <div>
+        Nome: <input type="text" id="nomeField" placeholder="Digite o nome da tarefa">
+     </div>
+
+     <div>
+        Prioridade: <input type="text" id="prioridadeField" placeholder="Digite a prioridade da tarefa">
+    </div>
+
+     <button id="fetchButton">Carregar Tarefas</button>
 
     <!-- Tabela para exibir dados -->
     <table id="dataTable">
@@ -61,23 +71,30 @@
 
         // Função para buscar dados do WebApp
         async function fetchData() {
-            const xhr = new XMLHttpRequest();
-            xhr.open("GET", webAppUrl, true); // Specify the HTTP method and URL
+            const filterValue = getFilterValue();
 
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4) { // Request is done
-                    if (xhr.status === 200) { // Success
-                        const data = JSON.parse(xhr.responseText);
-                        displayData(data);
-                    } else { // Error
-                        console.error('Error fetching data:', xhr.status, xhr.statusText);
-                        console.log('Response:', xhr.responseText); // Log the response for debugging
-                    }
-                }
+            // if (!filterValue.trim()) {
+            //     alert("Por favor, insira um valor para o filtro.");
+            //     return;
+            // }
+
+            // Construct the URL with the filter parameter
+            const urlWithFilter = `${webAppUrl}?filter=${new URLSearchParams(JSON.stringify(filterValue)).toString()}`;
+
+            try {
+                const response = await fetch(urlWithFilter);
+                const data = await response.json();
+                displayData(data);
+            } catch (error) {
+                console.error('Erro ao buscar dados:', error);
+            }
+        }
+
+        function getFilterValue() {
+            return {
+                nome: document.getElementById('nomeField').value,
+                prioridade: document.getElementById('prioridadeField').value
             };
-
-            // Send the request
-            xhr.send();
         }
 
         // Função para exibir os dados na tabela

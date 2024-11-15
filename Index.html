@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha Página de Tarefas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        input[type="text"] {
+            padding: 8px;
+            width: 300px;
+            margin-top: 10px;
+        }
+        button {
+            padding: 8px 15px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Gerenciamento de Tarefas</h1>
+
+    <!-- Formulário para inserir dados -->
+    <input type="text" id="inputField" placeholder="Digite o nome da tarefa">
+    <button id="submitButton">Inserir Tarefa</button>
+    
+    <button id="fetchButton">Carregar Tarefas</button>
+
+    <!-- Tabela para exibir dados -->
+    <table id="dataTable">
+        <thead>
+            <tr>
+                <th>Tarefa</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- As tarefas serão carregadas aqui -->
+        </tbody>
+    </table>
+
+    <script>
+        // URL do WebApp (agora com o link atualizado)
+        const webAppUrl = 'https://script.google.com/macros/library/d/1j7qCtRdiaxJCYikKkDkyJDSGjxf8_c_1Yekm7qvSVnjB9EmmBkdiYPAk/1';
+
+        // Função para buscar dados do WebApp
+        async function fetchData() {
+            try {
+                const response = await fetch(webAppUrl);
+                const data = await response.json();
+                displayData(data);
+            } catch (error) {
+                console.error('Erro ao buscar dados:', error);
+            }
+        }
+
+        // Função para exibir os dados na tabela
+        function displayData(data) {
+            const tableHead = document.querySelector('#dataTable thead tr');
+            const tableBody = document.querySelector('#dataTable tbody');
+
+            // Limpar conteúdo existente
+            tableHead.innerHTML = '';
+            tableBody.innerHTML = '';
+
+            // Adicionar cabeçalhos (no caso, apenas uma coluna: "Tarefa")
+            const th = document.createElement('th');
+            th.textContent = 'Tarefa';
+            tableHead.appendChild(th);
+
+            // Adicionar linhas de dados
+            data.rows.forEach(row => {
+                const tr = document.createElement('tr');
+                const td = document.createElement('td');
+                td.textContent = row[0];  // Assumindo que as tarefas estão na primeira coluna
+                tr.appendChild(td);
+                tableBody.appendChild(tr);
+            });
+        }
+
+        // Função para inserir dados no WebApp
+        async function insertData() {
+            const inputField = document.getElementById('inputField').value;
+
+            // Verifique se o campo de input não está vazio
+            if (!inputField.trim()) {
+                alert("Por favor, insira dados no campo.");
+                return;
+            }
+
+            try {
+                const response = await fetch(webAppUrl, {
+                    method: 'POST',
+                    body: JSON.stringify({ data: inputField }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    alert('Dados inseridos com sucesso!');
+                    document.getElementById('inputField').value = ''; // Limpa o campo de input
+                    fetchData(); // Atualiza os dados na tabela
+                } else {
+                    alert('Erro ao inserir dados.');
+                }
+            } catch (error) {
+                console.error('Erro ao inserir dados:', error);
+                alert('Erro de conexão. Tente novamente mais tarde.');
+            }
+        }
+
+        // Event listeners para os botões
+        document.getElementById('fetchButton').addEventListener('click', fetchData);
+        document.getElementById('submitButton').addEventListener('click', insertData);
+    </script>
+
+</body>
+</html>
